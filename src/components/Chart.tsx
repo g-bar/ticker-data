@@ -3,7 +3,7 @@ import { useCallback, useRef, useState } from 'react'
 import Plot from 'react-plotly.js'
 
 interface Props {
-  chartData?: {
+  data?: {
     x: string[]
     open: number[]
     close: number[]
@@ -15,7 +15,7 @@ interface Props {
   selectedSymbol: string
 }
 
-export default function Chart({ chartData, fetching, error, selectedSymbol }: Props) {
+export default function Chart({ data, fetching, error, selectedSymbol }: Props) {
   const plotRef = useRef<HTMLDivElement>(null)
   const [plotSize, setPlotSize] = useState<{ height: number; width: number } | null>(null)
 
@@ -35,10 +35,10 @@ export default function Chart({ chartData, fetching, error, selectedSymbol }: Pr
 
   return (
     <div ref={plotRef} className="w-full h-full mt-5">
-      {!chartData && <div className="w-full h-full flex items-center justify-center">{getNoDataMessage()}</div>}
-      {!!chartData && (
+      {!data && <div className="w-full h-full flex items-center justify-center">{getNoDataMessage()}</div>}
+      {!!data && (
         <Plot
-          data={[{ ...chartData, type: 'candlestick' }]}
+          data={[{ ...data, type: 'candlestick' }]}
           layout={{ width: plotSize?.width, height: plotSize?.height, title: selectedSymbol }}
         />
       )}

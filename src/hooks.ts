@@ -58,7 +58,7 @@ export function useFetchSymbolData(symbol: string) {
     fetchData()
   }, [symbol])
 
-  return { chartData, error, fetching }
+  return { data: chartData, error, fetching }
 }
 
 type TickerData = {
