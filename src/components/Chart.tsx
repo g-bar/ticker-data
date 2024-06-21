@@ -3,7 +3,7 @@ import { useCallback, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 
 // Import Plot dynamically and disable ssr, plotly seems to be
-// incompatible with the server (error thrown when pre-srendering)
+// incompatible with the server (error thrown when pre-rendering)
 const Plot = dynamic(() => import('react-plotly.js'), { ssr: false })
 
 interface Props {
