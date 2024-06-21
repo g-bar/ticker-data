@@ -42,7 +42,7 @@ export function useFetchSymbolData(symbol: string) {
 
   useEffect(() => {
     const setFetching = (v: boolean) => {
-      if (!v)
+      if (v)
         // Only show loading message if data fetch takes longer than 2 seconds
         setTimeout(() => setFetchingState(v), 2000)
       else setFetchingState(v)
