@@ -1,9 +1,14 @@
 import { useEffect, useLayoutEffect, useState, useRef, useMemo } from 'react'
 import { useDebounceCallback } from 'usehooks-ts'
 
+/* 
+  Runs onResize when the window is resized 
+*/
 export function useWindowResizeEffect(onResize: () => void, debounceIntervalMs = 0) {
   const debouncedOnResize = useDebounceCallback(onResize, debounceIntervalMs)
 
+  // Initial call, useLayoutEffect to avoid painting the chart before the dimensions
+  // have been determined
   useLayoutEffect(() => {
     onResize()
   }, [onResize])
@@ -14,6 +19,9 @@ export function useWindowResizeEffect(onResize: () => void, debounceIntervalMs =
   }, [debouncedOnResize])
 }
 
+/* 
+  Fetch ticker data for the given symbol 
+*/
 export function useFetchSymbolData(symbol: string) {
   const [data, setData] = useState<TickerData | null>(null)
   const [error, setError] = useState('')
@@ -35,7 +43,7 @@ export function useFetchSymbolData(symbol: string) {
   useEffect(() => {
     const setFetching = (v: boolean) => {
       if (!v)
-        // Only show fetching message if data fetch takes longer than 2 seconds
+        // Only show loading message if data fetch takes longer than 2 seconds
         setTimeout(() => setFetchingState(v), 2000)
       else setFetchingState(v)
       fetchingRef.current = v

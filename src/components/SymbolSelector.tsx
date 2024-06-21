@@ -5,6 +5,9 @@ interface Props {
   setSelectedSymbol: (symbol: string) => void
 }
 
+/* Displays the symbol selector, when the user types into the 
+search box the api is queried to search for available symbols
+*/
 export default function SymbolSelector({ setSelectedSymbol }: Props) {
   const loadOptions = useDebounceCallback((inputValue: string, callback: (data: { label: string }[]) => void) => {
     if (!inputValue) return

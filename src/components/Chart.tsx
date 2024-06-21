@@ -15,17 +15,20 @@ interface Props {
   selectedSymbol: string
 }
 
+/* Displays the chart */
 export default function Chart({ data, fetching, error, selectedSymbol }: Props) {
   const plotRef = useRef<HTMLDivElement>(null)
   const [plotSize, setPlotSize] = useState<{ height: number; width: number } | null>(null)
 
-  const onResize = useCallback(() => {
-    if (!plotRef.current) return
-    const { width, height } = plotRef.current.getBoundingClientRect()
-    setPlotSize({ width: width - 50, height: height - 50 })
-  }, [])
-
-  useWindowResizeEffect(onResize, 300)
+  // Adjust the size of the chart when the window is resized
+  useWindowResizeEffect(
+    useCallback(() => {
+      if (!plotRef.current) return
+      const { width, height } = plotRef.current.getBoundingClientRect()
+      setPlotSize({ width: width - 50, height: height - 50 })
+    }, []),
+    300
+  )
 
   function getNoDataMessage() {
     if (fetching) return 'Loading...'
