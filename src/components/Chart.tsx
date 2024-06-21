@@ -1,6 +1,10 @@
 import { useWindowResizeEffect } from '@/hooks'
 import { useCallback, useRef, useState } from 'react'
-import Plot from 'react-plotly.js'
+import dynamic from 'next/dynamic'
+
+// Import Plot dynamically and disable ssr, plotly seems to be
+// incompatible with the server (error thrown when pre-srendering)
+const Plot = dynamic(() => import('react-plotly.js'), { ssr: false })
 
 interface Props {
   data?: {
