@@ -7,8 +7,9 @@ interface Props {
 
 export default function SymbolSelector({ setSelectedSymbol }: Props) {
   const loadOptions = useDebounceCallback((inputValue: string, callback: (data: { label: string }[]) => void) => {
+    if (!inputValue) return
     const loadSymbols = async () => {
-      const res = await fetch('symbols.json')
+      const res = await fetch(`/api?function=SYMBOL_SEARCH&keywords=${inputValue}`)
       const symbolsRes = (await res.json()) as SymbolData
       const symbols = symbolsRes.bestMatches.map(s => ({ label: s['1. symbol'] }))
 

@@ -44,7 +44,7 @@ export function useFetchSymbolData(symbol: string) {
     if (!symbol || fetchingRef.current) return
     const fetchData = async () => {
       setFetching(true)
-      const res = await fetch('data.json')
+      const res = await fetch(`/api?function=TIME_SERIES_MONTHLY_ADJUSTED&symbol=${symbol}`)
       if (!res.ok) {
         setError('There was an error fetching the data, please try again!')
         setFetching(false)
