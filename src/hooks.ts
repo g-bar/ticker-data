@@ -1,5 +1,7 @@
 import { useEffect, useLayoutEffect, useState, useRef, useMemo } from 'react'
 import { useDebounceCallback } from 'usehooks-ts'
+import { Frequency } from './types'
+import { capitalize } from './utils'
 
 /* 
   Runs onResize when the window is resized 
@@ -22,7 +24,7 @@ export function useWindowResizeEffect(onResize: () => void, debounceIntervalMs =
 /* 
   Fetch ticker data for the given symbol 
 */
-export function useFetchSymbolData(symbol: string) {
+export function useFetch(frequency: Frequency, symbol: string) {
   const [data, setData] = useState<TickerData | null>(null)
   const [error, setError] = useState('')
   const [fetching, setFetchingState] = useState(false)
@@ -30,9 +32,9 @@ export function useFetchSymbolData(symbol: string) {
 
   const chartData = useMemo(() => {
     if (!data) return
-    const values = Object.values(data['Monthly Adjusted Time Series'])
+    const values = Object.values(data)
     return {
-      x: Object.keys(data['Monthly Adjusted Time Series']),
+      x: Object.keys(data),
       open: values.map(v => v['1. open']),
       close: values.map(v => v['4. close']),
       high: values.map(v => v['2. high']),
@@ -42,43 +44,55 @@ export function useFetchSymbolData(symbol: string) {
 
   useEffect(() => {
     const setFetching = (v: boolean) => {
-      if (v)
-        // Only show loading message if data fetch takes longer than 2 seconds
-        setTimeout(() => setFetchingState(v), 2000)
-      else setFetchingState(v)
+      setFetchingState(v)
       fetchingRef.current = v
     }
 
     if (!symbol || fetchingRef.current) return
+
     const fetchData = async () => {
       setFetching(true)
-      const res = await fetch(`/api?function=TIME_SERIES_MONTHLY_ADJUSTED&symbol=${symbol}`)
-      if (!res.ok) {
-        setError('There was an error fetching the data, please try again!')
+      setData(null)
+      const res = await fetch(`/api?function=${getFunction(frequency)}&symbol=${symbol}`)
+      const data = await res.json()
+
+      const key = getDataKey(frequency)
+
+      if (!res.ok || !data[key]) {
+        setData(null)
+        setError(data.Information || 'There was an error fetching the data, please try again!')
         setFetching(false)
         return
       }
-      setData((await res.json()) as TickerData)
+
+      setData(data[key] as TickerData)
       setError('')
       setFetching(false)
     }
 
     fetchData()
-  }, [symbol])
+  }, [symbol, frequency])
 
   return { data: chartData, error, fetching }
 }
 
 type TickerData = {
-  'Monthly Adjusted Time Series': {
-    [time: string]: {
-      '1. open': number
-      '2. high': number
-      '3. low': number
-      '4. close': number
-      '5. adjusted': number
-      '6. volume': number
-      '7. dividend amount': number
-    }
+  [time: string]: {
+    '1. open': number
+    '2. high': number
+    '3. low': number
+    '4. close': number
+    '5. adjusted': number
+    '6. volume': number
+    '7. dividend amount': number
   }
+}
+
+function getFunction(frequency: Frequency) {
+  return `TIME_SERIES_${frequency.toUpperCase()}`
+}
+
+function getDataKey(frequency: Frequency) {
+  if (frequency === 'daily') return `Time Series (Daily)`
+  return `${capitalize(frequency)} Time Series`
 }

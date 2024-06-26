@@ -9,3 +9,7 @@ export function getEnvVar(envvar: string) {
   if (typeof value !== 'string' || value === '') throw new Error(`${envvar} is missing or invalid.`)
   return value
 }
+
+export function capitalize(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
